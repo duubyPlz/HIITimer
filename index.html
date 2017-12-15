@@ -4,26 +4,51 @@
 
 <head>
 
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-1.10.2.js" type="text/javascript"></script>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
-
   <!-- Bootstrap -->
-  <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link href="bootstrap3/css/bootstrap.css" rel="stylesheet">
+  
+  <!-- jQuery -->
+  <script src="bootstrap3/jquery/jquery-1.10.2.js" type="text/javascript"></script>
+  <script type="text/javascript" src="bootstrap3/jquery/jquery-ui.custom.min.js"></script>
 
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <!-- JS -->
+  <script src="bootstrap3/js/bootstrap.js" type="text/javascript"></script>
 
   <!-- Titles -->
   <link rel="icon" href="https://image.flaticon.com/icons/png/512/18/18057.png"> <!-- TODO: add ribbon -->
   <title>HIITimer</title>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Exo:300|Share+Tech+Mono|Orbitron:400,700,500,900" rel="stylesheet">
+  <!-- <link href="https://fonts.googleapis.com/css?family=Exo:300|Share+Tech+Mono|Orbitron:400,700,500,900" rel="stylesheet"> -->
 
   <!-- Custom Style -->
   <style>
+    @font-face {
+      font-family: 'Exo';
+      font-style: normal;
+      font-weight: 300;
+      src: url('./fonts/exo-v6-latin-300.eot'); /* IE9 Compat Modes */
+      src: local('Exo Light'), local('Exo-Light'),
+           url('./fonts/exo-v6-latin-300.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+           url('./fonts/exo-v6-latin-300.woff2') format('woff2'), /* Super Modern Browsers */
+           url('./fonts/exo-v6-latin-300.woff') format('woff'), /* Modern Browsers */
+           url('./fonts/exo-v6-latin-300.ttf') format('truetype'), /* Safari, Android, iOS */
+           url('./fonts/exo-v6-latin-300.svg#Exo') format('svg'); /* Legacy iOS */
+    }
+
+    @font-face {
+      font-family: 'Share Tech Mono';
+      font-style: normal;
+      font-weight: 400;
+      src: url('./fonts/share-tech-mono-v7-latin-regular.eot'); /* IE9 Compat Modes */
+      src: local('Share Tech Mono'), local('ShareTechMono-Regular'),
+           url('./fonts/share-tech-mono-v7-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+           url('./fonts/share-tech-mono-v7-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+           url('./fonts/share-tech-mono-v7-latin-regular.woff') format('woff'), /* Modern Browsers */
+           url('./fonts/share-tech-mono-v7-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+           url('./fonts/share-tech-mono-v7-latin-regular.svg#ShareTechMono') format('svg'); /* Legacy iOS */
+    }
+
     body, code {
       font-family: 'Exo', sans-serif;
       font-weight: 300;
@@ -81,9 +106,6 @@
       font-family: 'Exo', sans-serif;
       text-transform: uppercase;
       margin: auto;
-      background-image: linear-gradient(90deg,#00d9bf,#00d977);
-      box-shadow: 0 3px 0 0 #00bb85, 0 2px 8px 0 #00d99b, 0 4px 10px 0 rgba(33,7,77,.5);
-      text-shadow: 0 1px 3px rgba(0,0,0,.3);
       border: none;
       line-height: calc(1.25rem + 4px);
       width: 280px;
@@ -91,15 +113,21 @@
       font-size: 18px;
     }
 
-    #big-button:hover,
-    #big-button:focus {
+    #big-button.green {      
+      background-image: linear-gradient(90deg,#00d9bf,#00d977);
+      box-shadow: 0 3px 0 0 #00bb85, 0 2px 8px 0 #00d99b, 0 4px 10px 0 rgba(33,7,77,.5);
+      text-shadow: 0 1px 3px rgba(0,0,0,.3);
+    }
+
+    #big-button.green:hover,
+    #big-button.green:focus {
       background-image: linear-gradient(90deg,#24dec8,#24de8a);
       /*box-shadow: none;*/
       border-color: transparent;
       outline: 0;
     }
 
-    #big-button:active {
+    #big-button.green:active {
       background-image: linear-gradient(90deg,#00bba5,#0b6);
       box-shadow: none;
       border-color: transparent;
@@ -111,7 +139,7 @@
       <span id='countdown'>15</span> sec
   </div>
   <div class='container big-button-container'>
-    <button class='btn btn-success' id='big-button'>Start</button>
+    <button class='btn btn-success green' id='big-button'>Start</button>
   </div>
 <!--   <footer class='footer'>
     <code>Space</code> to start/stop<br/>
@@ -120,9 +148,9 @@
 
   <!-- Custom Script -->
   <script>
-    var minutes = $('#minutes').html();
-    var seconds = $('#seconds').html();
-    var counter = 0;
+    var countdownHtml = $('#countdown').html();
+    var countdown = parseInt(countdownHtml);
+    console.log(countdown);
 
     var globalFlag = false;
     var timer;
@@ -130,7 +158,44 @@
     var msg;
     speechSetup();
 
+    // start
+    $('#big-button').on('click', function() {
+        if (globalFlag == false) {
+          timerOn();
+          // console.log("ON");
+        } else {
+          clearInterval(timer);
+          timerOff();          
+          // console.log("OFF");
+        }
+    });
 
+    function timerOn() {
+      globalFlag = true;
+      speak('開始');
+
+      timer = setInterval(function() {
+        countdown--;
+        $('#countdown').html(countdown);
+
+        if (countdown == 0) {
+          clearInterval(timer);
+        }
+      }, 1000);
+      // countdown is now zero
+      console.log("finished");
+    }
+
+    function speak(number) {
+      msg.text = number;
+      speechSynthesis.speak(msg);
+    }
+
+    function timerOff() {
+      globalFlag = false;
+      speak('停止');
+      clearInterval(timer);
+    }
 
     function speechSetup() {
         msg = new SpeechSynthesisUtterance();
