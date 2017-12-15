@@ -270,19 +270,18 @@
       runningFlag = true;
       $('#play-indicator').addClass('glyphicon-play');
 
-      speak('跑喇謂');
-
       $('.inactive').hide();
       $('.active').show();
 
       // phase 1
-      speak('第' + lapCounter + '堂');
       running();
     }
 
     function running() {
       countdown = 15;
       runningFlag = true;
+      speak('跑喇謂');
+      speak('第' + lapCounter + '堂');
       
       runTimer = setInterval(function() {
         countdown--;
@@ -293,12 +292,13 @@
           // > phase 2
           walking();
         }
-      }, 500);
+      }, 100);
     }
 
     function walking() {
       countdown = 45;
       runningFlag = false;
+      speak('可以行');
 
       walkTimer = setInterval(function() {
         countdown--;
@@ -312,12 +312,11 @@
             reset(); // exit
           } else {
             lapCounter++;
-            speak('第' + lapCounter + '堂');
           }
           // > back to phase 1
           running();
         }
-      }, 500);
+      }, 100);
     }
 
     function timerOff() {
