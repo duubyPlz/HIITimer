@@ -191,11 +191,59 @@
       box-shadow: none;
       border-color: transparent;
     }
+
+    @media screen and (max-device-width: 768px)
+                  and (orientation: portrait) {
+      body {
+        font-size: 500%;
+      }
+    
+      .countdown-container {
+        width: 700px;
+        padding-top: 300px;
+        left: 140px;
+      }
+
+      .lap {
+        right: 100px;
+        bottom: 100px;
+      }
+
+      #countdown {
+        font-size: 700%;
+      }
+
+      .buttons-container {
+        width: 700px;
+      }
+
+      .buttons {
+        font-size: 110%;
+        height: 250px;
+      }
+  
+      #start-button {
+        width: 500px;
+      }
+
+      #pause-button {
+        width: 300px;
+      }
+
+      #stop-button {
+        width: 300px;
+      }
+    }
+
+    @media screen and (max-device-width: 768px)
+                  and (orientation: landscape) {
+     /* todo */
+    }
   </style>
 </head>
 <body class='dark-theme'>
   <div class='container countdown-container'>
-    <div class='top-right pull-right' class='lap'>
+    <div class='top-right pull-right lap'>
       <span class="glyphicon " aria-hidden="true" id='play-indicator'></span>
       <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
       <span id='lap-counter'>1</span>
@@ -314,7 +362,7 @@
             reset(); // exit
           } else {
             lapCounter++;
-            $('#lap-counter').html(3);
+            $('#lap-counter').html(lapCounter);
             // > back to phase 1
             countdown = 15;
             running();
