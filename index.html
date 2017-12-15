@@ -102,6 +102,10 @@
       margin: auto;
     }
 
+    #countdown.grey {
+      color: #666;
+    }
+
     .buttons-container {
       width: 470px; 
       padding-top: 50px;
@@ -214,19 +218,22 @@
 
   <!-- Custom Script -->
   <script>
+    // reset
     $('#countdown').html('15');
     var countdownHtml = $('#countdown').html();
     var countdown = parseInt(countdownHtml);
-
     var globalFlag = false;
+    var runningFlag = true;
     $('#play-indicator').removeClass('glyphicon-play');
-
     var lapCounter = 1;
-    var timer;
 
+    // global vars
+    var runTimer;
+    var walkTimer;
     var msg;
-    speechSetup();
 
+    // init
+    speechSetup();
 
     // start
     $('#start-button').on('click', function() {
@@ -260,6 +267,7 @@
 
     function timerOn() {
       globalFlag = true;
+      runningFlag = true;
       $('#play-indicator').addClass('glyphicon-play');
 
       speak('跑喇謂');
@@ -267,16 +275,49 @@
       $('.inactive').hide();
       $('.active').show();
 
-      timer = setInterval(function() {
+      // phase 1
+      speak('第' + lapCounter + '堂');
+      running();
+    }
+
+    function running() {
+      countdown = 15;
+      runningFlag = true;
+      
+      runTimer = setInterval(function() {
         countdown--;
-        $('#countdown').html(countdown);
+        display(countdown);
 
         if (countdown == 0) {
-          clearInterval(timer);
+          clearInterval(runTimer);
+          // > phase 2
+          walking();
         }
-      }, 1000);
-      // countdown is now zero
-      console.log("finished");
+      }, 500);
+    }
+
+    function walking() {
+      countdown = 45;
+      runningFlag = false;
+
+      walkTimer = setInterval(function() {
+        countdown--;
+        display(countdown);
+
+        if (countdown == 0) {
+          clearInterval(walkTimer);
+          // finished countdown (45)
+          // > increment count
+          if (lapCounter == 10) {
+            reset(); // exit
+          } else {
+            lapCounter++;
+            speak('第' + lapCounter + '堂');
+          }
+          // > back to phase 1
+          running();
+        }
+      }, 500);
     }
 
     function timerOff() {
@@ -284,7 +325,8 @@
       $('#play-indicator').removeClass('glyphicon-play');
 
       speak('暫停');
-      clearInterval(timer);
+      clearInterval(runTimer);
+      clearInterval(walkTimer);
     }
 
     function reset() {
@@ -295,14 +337,28 @@
         speak('停止');
       }
 
-      // reset numbers
+      // reset
       $('#countdown').html('15');
       var countdownHtml = $('#countdown').html();
       var countdown = parseInt(countdownHtml);
+      var globalFlag = false;
+      var runningFlag = true;
+      $('#play-indicator').removeClass('glyphicon-play');
+      var lapCounter = 1;
 
+      // reset buttons
       $('.inactive').show();
       $('.active').hide();
-      console.log("HERE");
+    }
+
+    function display(countdown) {
+      var string;
+      if (countdown > 9) {
+        string = countdown;
+      } else {
+        string = '&nbsp;' + countdown;
+      }
+      $('#countdown').html(string);
     }
 
     function speak(number) {
