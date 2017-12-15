@@ -267,9 +267,8 @@
   <!-- Custom Script -->
   <script>
     // reset
-    $('#countdown').html('15');
-    var countdownHtml = $('#countdown').html();
-    var countdown = parseInt(countdownHtml);
+    var countdown = 15;
+    var countdownHtml = $('#countdown').html(countdown);
     var globalFlag = false;
     var runningFlag = true;
     $('#play-indicator').removeClass('glyphicon-play');
@@ -332,9 +331,10 @@
       speak('跑喇謂');
       speak('第' + lapCounter + '堂');
       
+      var herp = countdown;
       runTimer = setInterval(function() {
-        countdown--;
-        display(countdown);
+        herp--;
+        display(herp);
 
         if (countdown <= 0) {
           clearInterval(runTimer);
@@ -348,10 +348,10 @@
     function walking() {
       runningFlag = false;
       speak('可以行');
-
+      var derp = countdown;
       walkTimer = setInterval(function() {
-        countdown--;
-        display(countdown);
+        derp--;
+        display(derp);
 
         if (countdown <= 0) {
           clearInterval(walkTimer);
@@ -388,9 +388,8 @@
       }, 500);
 
       // reset
-      $('#countdown').html('15');
-      var countdownHtml = $('#countdown').html();
       var countdown = 15;
+      var countdownHtml = $('#countdown').html(countdown);
       var globalFlag = false;
       var runningFlag = true;
       $('#play-indicator').removeClass('glyphicon-play');
