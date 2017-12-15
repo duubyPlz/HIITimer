@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html lang="en">
+
+<head>
+  <!-- Bootstrap -->
+  <link href="bootstrap3/css/bootstrap.css" rel="stylesheet">
+  
+  <!-- jQuery -->
+  <script src="bootstrap3/jquery/jquery-1.10.2.js" type="text/javascript"></script>
+  <script type="text/javascript" src="bootstrap3/jquery/jquery-ui.custom.min.js"></script>
+
+  <!-- JS -->
+  <script src="bootstrap3/js/bootstrap.js" type="text/javascript"></script>
+
+  <!-- Titles -->
+  <link rel="icon" href="http://www.freeiconspng.com/uploads/timer-icon-0.png">
+  <title>Timer</title>
+
+  <!-- Fonts -->
+  <link href='https://fonts.googleapis.com/css?family=Orbitron:400,700,500,900' rel='stylesheet' type='text/css'>
+
+  <!-- Custom Style -->
+  <style>
+    body, h1, code {
+      font-family: 'Orbitron', sans-serif;
+    }
+  
+    code {
+      padding-top: 6px;
+    }
+
+    h1 {
+      font-size: 200px;
+    }
+
+    body.dark-theme {
+      background-color: #111;
+      color: #eee;
+    }
+
+    /*
+    .center {
+      text-align: center;
+      padding-top: 200px;
+    }
+    */
+
+    footer.footer {
+        text-align: center;
+        color: #777;
+        /*font-size: 95%;*/
+        line-height: 27px;
+        position: relative;
+        top: 240px;
+    }
+
+    body.dark-theme code {
+      /* red */
+      /*background-color: rgba(199, 37, 78, 0.7);
+      color: #f9f2f4;*/
+
+      /* green */
+      background-color: rgba(7, 238, 0, 0.65);
+      /*color: rgba(245, 255, 245, 1);*/
+      color: white;
+    }
+  </style>
+</head>
+<body class='dark-theme'>
+  <div class='row' style='padding-top: 200px'>
+    <div class='col-md-3'>
+    </div>
+    <div class='col-md-6'>
+      <h1>
+        <span id='minutes'>00</span>:<span id='seconds'>00</span>
+      </h1>
+    </div>
+    <!-- <div class='col-md-3'>
+      <h1><span id='minutes'>00</span>:</h1>
+    </div>
+    <div class='col-md-3'>
+      <h1><span id='seconds'>00</span></h1>
+    </div> -->
+    <div class='col-md-3'>
+    </div>
+  </div>
+  <!-- <div class='center'>
+  </div> -->
+  <footer class='footer'>
+    <code>Space</code> to start/stop<br/>
+    <code>R</code> to reset
+  </footer>
+
+  <!-- Custom Script -->
+  <script>
+    var minutes = $('#minutes').html();
+    var seconds = $('#seconds').html();
+    var counter = 0;
+
+    var globalFlag = false;
+    var timer;
+
+    var msg;
+    speechSetup();
+
+    $(document).keypress(function(e) {
+      // Space pressed
+      if (e.keyCode == 32) {
+        if (globalFlag == false) {
+          timerOn();
+          // console.log("ON");
+        } else {
+          clearInterval(timer);
+          timerOff();          
+          // console.log("OFF");
+        }
+      }
+
+      // R or r pressed
+      if (e.keyCode == 82 || e.keyCode == 114) {
+        if (globalFlag == true) {
+          timerOff();
+        }
+
+        // reset numbers
+        seconds = 0;
+        minutes = 0;
+        counter = 0;
+        $('#seconds').html('00');
+        $('#minutes').html('00');
+      }
+
+      function timerOn() {
+        speak('開始');
+        // logic from:
+        // https://stackoverflow.com/questions/5517597/plain-count-up-timer-in-javascript
+        // second loop
+        timer = setInterval(function() {
+          counter++;
+          seconds = pad(counter % 60);
+          minutes = pad(parseInt(counter/60,10));
+          $('#seconds').html(seconds);
+          $('#minutes').html(minutes);
+
+          // speak
+          if ((counter % 5) == 0) {
+            if (minutes == 0) {
+              if (seconds == '05') {
+                speak('5秒');
+              } else {
+                speak(seconds + '秒');
+              }
+            } else if (seconds == 0) {
+              var minutesNoZeroStart = minutes.replace(/^0/, "");
+              if (minutesNoZeroStart == 2) {
+                speak('兩分鐘');
+              } else {
+                speak(minutesNoZeroStart + '分鐘');
+              }
+            } else {
+              var minutesNoZeroStart = minutes.replace(/^0/, "");
+              if (minutesNoZeroStart == 2) {
+                speak('兩分 ' + seconds + '秒');
+              } else {
+                speak(minutesNoZeroStart + '分 ' + seconds + '秒');
+              }
+            }
+          }
+        }, 1000);
+        globalFlag = true;
+      }
+
+      function timerOff() {
+        speak('停止');
+        clearInterval(timer);
+        globalFlag = false;
+      }
+
+      function pad(val) {
+        return val > 9 ? val : "0" + val;
+      }
+
+      function speak(number) {
+        msg.text = number;
+        speechSynthesis.speak(msg);
+      }
+    });
+
+    function speechSetup() {
+        msg = new SpeechSynthesisUtterance();
+        var voices = window.speechSynthesis.getVoices();
+        msg.voice = voices[81]; // Note: some voices don't support altering params
+        // msg.voiceURI = 'native';
+        msg.volume = 1; // 0 to 1
+        msg.rate = 1; // 0.1 to 10
+        msg.pitch = 2; //0 to 2
+        msg.lang = 'zh-HK';
+        // msg.lang = 'en-AU';
+    }
+  </script>
+</body>
+</html>
