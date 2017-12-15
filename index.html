@@ -16,24 +16,22 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
   <!-- Titles -->
-  <link rel="icon" href="http://www.freeiconspng.com/uploads/timer-icon-0.png">
-  <title>Timer</title>
+  <link rel="icon" href="https://image.flaticon.com/icons/png/512/18/18057.png"> <!-- TODO: add ribbon -->
+  <title>HIITimer</title>
 
   <!-- Fonts -->
-  <link href='https://fonts.googleapis.com/css?family=Orbitron:400,700,500,900' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/css?family=Exo:300|Share+Tech+Mono|Orbitron:400,700,500,900" rel="stylesheet">
 
   <!-- Custom Style -->
   <style>
-    body, h1, code {
-      font-family: 'Orbitron', sans-serif;
+    body, code {
+      font-family: 'Exo', sans-serif;
+      font-weight: 300;
+      font-size: 16px;
     }
   
     code {
       padding-top: 6px;
-    }
-
-    h1 {
-      font-size: 200px;
     }
 
     body.dark-theme {
@@ -41,17 +39,9 @@
       color: #eee;
     }
 
-    /*
-    .center {
-      text-align: center;
-      padding-top: 200px;
-    }
-    */
-
     footer.footer {
         text-align: center;
         color: #777;
-        /*font-size: 95%;*/
         line-height: 27px;
         position: relative;
         top: 240px;
@@ -64,35 +54,69 @@
 
       /* green */
       background-color: rgba(7, 238, 0, 0.65);
-      /*color: rgba(245, 255, 245, 1);*/
       color: white;
+    }
+
+    .countdown-container {
+      width: 300px;
+      padding-top: 150px;
+      position: relative;
+      left: 20px;
+    }
+
+    #countdown {
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: 400;
+      letter-spacing: -7px;
+      font-size: 220px;
+      margin: auto;
+    }
+
+    .big-button-container {
+      width: 300px; 
+      padding-top: 50px;
+    }
+
+    #big-button {
+      font-family: 'Exo', sans-serif;
+      text-transform: uppercase;
+      margin: auto;
+      background-image: linear-gradient(90deg,#00d9bf,#00d977);
+      box-shadow: 0 3px 0 0 #00bb85, 0 2px 8px 0 #00d99b, 0 4px 10px 0 rgba(33,7,77,.5);
+      text-shadow: 0 1px 3px rgba(0,0,0,.3);
+      border: none;
+      line-height: calc(1.25rem + 4px);
+      width: 280px;
+      height: 60px;
+      font-size: 18px;
+    }
+
+    #big-button:hover,
+    #big-button:focus {
+      background-image: linear-gradient(90deg,#24dec8,#24de8a);
+      /*box-shadow: none;*/
+      border-color: transparent;
+      outline: 0;
+    }
+
+    #big-button:active {
+      background-image: linear-gradient(90deg,#00bba5,#0b6);
+      box-shadow: none;
+      border-color: transparent;
     }
   </style>
 </head>
 <body class='dark-theme'>
-  <div class='row' style='padding-top: 200px'>
-    <div class='col-md-3'>
-    </div>
-    <div class='col-md-6'>
-      <h1>
-        <span id='minutes'>00</span>:<span id='seconds'>00</span>
-      </h1>
-    </div>
-    <!-- <div class='col-md-3'>
-      <h1><span id='minutes'>00</span>:</h1>
-    </div>
-    <div class='col-md-3'>
-      <h1><span id='seconds'>00</span></h1>
-    </div> -->
-    <div class='col-md-3'>
-    </div>
+  <div class='container countdown-container'>
+      <span id='countdown'>15</span> sec
   </div>
-  <!-- <div class='center'>
-  </div> -->
-  <footer class='footer'>
+  <div class='container big-button-container'>
+    <button class='btn btn-success' id='big-button'>Start</button>
+  </div>
+<!--   <footer class='footer'>
     <code>Space</code> to start/stop<br/>
     <code>R</code> to reset
-  </footer>
+  </footer> -->
 
   <!-- Custom Script -->
   <script>
@@ -106,88 +130,7 @@
     var msg;
     speechSetup();
 
-    $(document).keypress(function(e) {
-      // Space pressed
-      if (e.keyCode == 32) {
-        if (globalFlag == false) {
-          timerOn();
-          // console.log("ON");
-        } else {
-          clearInterval(timer);
-          timerOff();          
-          // console.log("OFF");
-        }
-      }
 
-      // R or r pressed
-      if (e.keyCode == 82 || e.keyCode == 114) {
-        if (globalFlag == true) {
-          timerOff();
-        }
-
-        // reset numbers
-        seconds = 0;
-        minutes = 0;
-        counter = 0;
-        $('#seconds').html('00');
-        $('#minutes').html('00');
-      }
-
-      function timerOn() {
-        speak('開始');
-        // logic from:
-        // https://stackoverflow.com/questions/5517597/plain-count-up-timer-in-javascript
-        // second loop
-        timer = setInterval(function() {
-          counter++;
-          seconds = pad(counter % 60);
-          minutes = pad(parseInt(counter/60,10));
-          $('#seconds').html(seconds);
-          $('#minutes').html(minutes);
-
-          // speak
-          if ((counter % 5) == 0) {
-            if (minutes == 0) {
-              if (seconds == '05') {
-                speak('5秒');
-              } else {
-                speak(seconds + '秒');
-              }
-            } else if (seconds == 0) {
-              var minutesNoZeroStart = minutes.replace(/^0/, "");
-              if (minutesNoZeroStart == 2) {
-                speak('兩分鐘');
-              } else {
-                speak(minutesNoZeroStart + '分鐘');
-              }
-            } else {
-              var minutesNoZeroStart = minutes.replace(/^0/, "");
-              if (minutesNoZeroStart == 2) {
-                speak('兩分 ' + seconds + '秒');
-              } else {
-                speak(minutesNoZeroStart + '分 ' + seconds + '秒');
-              }
-            }
-          }
-        }, 1000);
-        globalFlag = true;
-      }
-
-      function timerOff() {
-        speak('停止');
-        clearInterval(timer);
-        globalFlag = false;
-      }
-
-      function pad(val) {
-        return val > 9 ? val : "0" + val;
-      }
-
-      function speak(number) {
-        msg.text = number;
-        speechSynthesis.speak(msg);
-      }
-    });
 
     function speechSetup() {
         msg = new SpeechSynthesisUtterance();
