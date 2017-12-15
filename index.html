@@ -90,7 +90,7 @@
       left: 70px;
     }
 
-    #lap {
+    .lap {
       position: relative;
       bottom: 20px;
       right: -50px;
@@ -195,10 +195,10 @@
 </head>
 <body class='dark-theme'>
   <div class='container countdown-container'>
-    <div class='top-right pull-right' id='lap'>
+    <div class='top-right pull-right' class='lap'>
       <span class="glyphicon " aria-hidden="true" id='play-indicator'></span>
       <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
-       1
+      <span id='lap-counter'>1</span>
     </div>
       <span id='countdown'>15</span> <span style='color: #666'>sec</span>
   </div>
@@ -287,7 +287,7 @@
         countdown--;
         display(countdown);
 
-        if (countdown == 0) {
+        if (countdown <= 0) {
           clearInterval(runTimer);
           // > phase 2
           walking();
@@ -304,14 +304,15 @@
         countdown--;
         display(countdown);
 
-        if (countdown == 0) {
+        if (countdown <= 0) {
           clearInterval(walkTimer);
           // finished countdown (45)
           // > increment count
-          if (lapCounter == 10) {
+          if (lapCounter >= 4) {
             reset(); // exit
           } else {
             lapCounter++;
+            $('#lap-counter').html(3);
           }
           // > back to phase 1
           running();
@@ -320,21 +321,20 @@
     }
 
     function timerOff() {
+      console.log('ENTERS TIMEROFF');
+      speak('暫停');
+
       globalFlag = false;
       $('#play-indicator').removeClass('glyphicon-play');
 
-      speak('暫停');
       clearInterval(runTimer);
       clearInterval(walkTimer);
     }
 
     function reset() {
-      if (globalFlag == true) {
-        timerOff();
-        speak('停止');
-      } else {
-        speak('停止');
-      }
+      timerOff();
+      console.log('ENTERS RESET');
+      speak('停止'); // screws up if synth is already speaking previously
 
       // reset
       $('#countdown').html('15');
