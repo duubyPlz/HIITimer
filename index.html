@@ -267,18 +267,19 @@
 
     function timerOn() {
       globalFlag = true;
-      runningFlag = true;
       $('#play-indicator').addClass('glyphicon-play');
 
       $('.inactive').hide();
       $('.active').show();
 
-      // phase 1
-      running();
+      if (runningFlag) {
+        running();
+      } else {
+        walking();
+      }
     }
 
     function running() {
-      countdown = 15;
       runningFlag = true;
       speak('跑喇謂');
       speak('第' + lapCounter + '堂');
@@ -290,13 +291,13 @@
         if (countdown <= 0) {
           clearInterval(runTimer);
           // > phase 2
+          countdown = 45;
           walking();
         }
-      }, 100);
+      }, 1000);
     }
 
     function walking() {
-      countdown = 45;
       runningFlag = false;
       speak('可以行');
 
@@ -308,33 +309,35 @@
           clearInterval(walkTimer);
           // finished countdown (45)
           // > increment count
-          if (lapCounter >= 4) {
+          if (lapCounter >= 10) {
+            speak('完成');
             reset(); // exit
           } else {
             lapCounter++;
             $('#lap-counter').html(3);
+            // > back to phase 1
+            countdown = 15;
+            running();
           }
-          // > back to phase 1
-          running();
         }
-      }, 100);
+      }, 1000);
     }
 
     function timerOff() {
-      console.log('ENTERS TIMEROFF');
+      clearInterval(runTimer);
+      clearInterval(walkTimer);
+
       speak('暫停');
 
       globalFlag = false;
       $('#play-indicator').removeClass('glyphicon-play');
-
-      clearInterval(runTimer);
-      clearInterval(walkTimer);
     }
 
     function reset() {
       timerOff();
-      console.log('ENTERS RESET');
-      speak('停止'); // screws up if synth is already speaking previously
+      setTimeout(function() {
+        speak('停止'); // screws up if synth is already speaking previously
+      }, 500);
 
       // reset
       $('#countdown').html('15');
@@ -344,6 +347,7 @@
       var runningFlag = true;
       $('#play-indicator').removeClass('glyphicon-play');
       var lapCounter = 1;
+      $('#lap-counter').html(lapCounter);
 
       // reset buttons
       $('.inactive').show();
