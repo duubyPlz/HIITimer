@@ -282,7 +282,7 @@
     // init
     speechSetup();
 
-    // start
+    // event listeners
     $('#start-button').on('click', function() {
       if (globalFlag == false) {
         timerOn();
@@ -311,8 +311,9 @@
       }
     })
 
-
+    // subroutines
     function timerOn() {
+      console.log('COUNTDOWN LOG [start] ' + countdown);
       globalFlag = true;
       $('#play-indicator').addClass('glyphicon-play');
 
@@ -372,6 +373,7 @@
     }
 
     function timerOff() {
+      console.log('COUNTDOWN LOG [stop] ' + countdown);
       clearInterval(runTimer);
       clearInterval(walkTimer);
 
