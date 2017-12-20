@@ -88,6 +88,7 @@
       padding-top: 150px;
       position: relative;
       left: 70px;
+      text-align: center;
     }
 
     .lap {
@@ -104,6 +105,15 @@
 
     #countdown.grey {
       color: #666;
+    }
+
+    #finished {
+      font-family: 'Exo', sans-serif;
+      font-size: 60px;
+      width: 400px;
+      padding-top: 50px;
+      margin: auto;
+      text-align: center;
     }
 
     .buttons-container {
@@ -242,17 +252,25 @@
   </style>
 </head>
 <body class='dark-theme'>
+  <!-- display -->
   <div class='container countdown-container'>
     <div class='top-right pull-right lap'>
       <span class="glyphicon " aria-hidden="true" id='play-indicator'></span>
       <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
       <span id='lap-counter'>1</span>
     </div>
-      <span id='countdown'>15</span> <span style='color: #666'>sec</span>
+    <span id='countdown'>15</span>
+    <span id='label-sec' style='color: #666'>sec</span>
   </div>
+  <div id='finished' style='display: none'>FINISHED</div>
+
+  <!-- buttons -->
   <div class='container buttons-container'>
     <div class='inactive'>
       <button class='btn btn-success buttons green' id='start-button'>Start</button>
+    </div>
+    <div class='restart' style='display: none'>
+      <button class='btn btn-success buttons green' id='restart-button'>Restart</button>
     </div>
     <div class='active' style='display: none'>
       <button class='btn btn-danger buttons red' id='stop-button'>Stop</button>
@@ -290,8 +308,17 @@
       } // else do nothing
     });
 
+    $('#restart-button').on('click', function() {
+      reset(false, false);
+
+      if (globalFlag == false) {
+        timerOn();
+        // console.log("ON");
+      } // else do nothing
+    })
+
     $('#stop-button').on('click', function() {
-      reset();
+      reset(false, true);
     });
 
     $('#pause-button').on('click', function() {
@@ -303,7 +330,7 @@
         pauseButton.removeClass('green');
         pauseButton.addClass('orange');
       } else {
-        timerOff();
+        timerOff(true);
 
         pauseButton.html('Start');
         pauseButton.removeClass('orange');
@@ -313,11 +340,11 @@
 
     // subroutines
     function timerOn() {
-      console.log('COUNTDOWN LOG [start] ' + countdown);
       globalFlag = true;
       $('#play-indicator').addClass('glyphicon-play');
 
       $('.inactive').hide();
+      $('.restart').hide();
       $('.active').show();
 
       if (runningFlag) {
@@ -332,10 +359,9 @@
       speak('跑喇謂');
       speak('第' + lapCounter + '堂');
       
-      var herp = countdown;
       runTimer = setInterval(function() {
-        herp--;
-        display(herp);
+        countdown--;
+        display(countdown);
 
         if (countdown <= 0) {
           clearInterval(runTimer);
@@ -343,24 +369,23 @@
           countdown = 45;
           walking();
         }
-      }, 1000);
+      }, 100);
     }
 
     function walking() {
       runningFlag = false;
       speak('可以行');
-      var derp = countdown;
       walkTimer = setInterval(function() {
-        derp--;
-        display(derp);
+        countdown--;
+        display(countdown);
 
         if (countdown <= 0) {
           clearInterval(walkTimer);
           // finished countdown (45)
           // > increment count
-          if (lapCounter >= 10) {
+          if (lapCounter >= 2) {
             speak('完成');
-            reset(); // exit
+            reset(true, true); // exit
           } else {
             lapCounter++;
             $('#lap-counter').html(lapCounter);
@@ -369,37 +394,71 @@
             running();
           }
         }
-      }, 1000);
+      }, 100);
     }
 
-    function timerOff() {
-      console.log('COUNTDOWN LOG [stop] ' + countdown);
+    function timerOff(speech) {
       clearInterval(runTimer);
       clearInterval(walkTimer);
 
-      speak('暫停');
+      if (speech) {
+        speak('暫停');
+      }
 
       globalFlag = false;
       $('#play-indicator').removeClass('glyphicon-play');
     }
 
-    function reset() {
-      timerOff();
-      setTimeout(function() {
-        speak('停止'); // screws up if synth is already speaking previously
-      }, 500);
+    function reset(isFinished, speech) {
+      if (isFinished) {
+        $('#play-indicator').removeClass('glyphicon-play');
+        displayFinished();
+      } else {
+        timerOff(speech);
 
-      // reset
-      var countdown = 15;
-      var countdownHtml = $('#countdown').html(countdown);
-      var globalFlag = false;
-      var runningFlag = true;
-      $('#play-indicator').removeClass('glyphicon-play');
-      var lapCounter = 1;
-      $('#lap-counter').html(lapCounter);
+        if (speech) {
+          setTimeout(function() {
+            speak('停止'); // screws up if synth is already speaking previously
+          }, 500);
+        }
 
-      // reset buttons
-      $('.inactive').show();
+        // 0. reset variables
+        countdown = 15;
+        countdownHtml = $('#countdown').html(countdown);
+
+        globalFlag = false;
+        runningFlag = true;
+        $('#play-indicator').removeClass('glyphicon-play');
+        lapCounter = 1;
+        $('#lap-counter').html(lapCounter);
+
+        // 1. reset visibilities
+        // > display, opposite of displayFinished()
+        $('#countdown').show();
+        $('#label-sec').show();
+        $('#finished').hide();
+
+        // > buttons
+        $('.inactive').show();
+        $('.restart').hide();
+        $('.active').hide();
+
+        // > reset pause button
+        $('#pause-button').html('Pause');
+        $('#pause-button').removeClass('green');
+        $('#pause-button').addClass('orange');
+      }
+    }
+
+    function displayFinished() {
+      // display
+      $('#countdown').hide();
+      $('#label-sec').hide();
+      $('#finished').show();
+
+      // buttons
+      $('.inactive').hide();
+      $('.restart').show();
       $('.active').hide();
     }
 
