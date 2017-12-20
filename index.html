@@ -370,7 +370,7 @@
           countdown = 45;
           walking();
         }
-      }, 100);
+      }, 1000);
     }
 
     function walking() {
@@ -384,7 +384,7 @@
           clearInterval(walkTimer);
           // finished countdown (45)
           // > increment count
-          if (lapCounter >= 2) {
+          if (lapCounter >= 10) {
             speak('完成');
             reset(true, true); // exit
           } else {
@@ -395,7 +395,7 @@
             running();
           }
         }
-      }, 100);
+      }, 1000);
     }
 
     function timerOff(speech) {
