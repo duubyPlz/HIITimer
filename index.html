@@ -15,7 +15,7 @@
   <script src="bootstrap3/js/bootstrap.js" type="text/javascript"></script>
 
   <!-- Titles -->
-  <link rel="icon" href="./favicon.png"> <!-- TODO: add ribbon -->
+  <link rel="icon" href="./favicon.png">
   <title>HIITimer</title>
 
   <!-- Fonts -->
@@ -229,8 +229,18 @@
         bottom: 100px;
       }
 
+      #lap-counter {
+        font-size: 120%;
+      }
+
       #countdown {
         font-size: 700%;
+      }
+
+      #finished {
+        font-size: 200%;
+        padding-top: 70px;
+        padding-bottom: 70px;
       }
 
       .buttons-container {
@@ -242,7 +252,8 @@
         height: 250px;
       }
   
-      #start-button {
+      #start-button,
+      #restart-button {
         width: 500px;
       }
 
@@ -306,6 +317,17 @@
     var runTimer;
     var walkTimer;
     var msg;
+
+    // debug
+    var debug = false;
+    var secondC = 1000;
+
+    // debug C
+    if (debug) {
+      secondC = 90;
+    } else {
+      secondC = 1000;
+    }
 
     // init
     speechSetup();
@@ -380,7 +402,7 @@
           countdown = 45;
           walking();
         }
-      }, 1000);
+      }, secondC);
     }
 
     function walking() {
@@ -388,6 +410,7 @@
       $('#countdown').addClass('grey');
       speak('可以行');
       walkTimer = setInterval(function() {
+        var totalLapsC = 10;
         countdown--;
         display(countdown);
 
@@ -395,7 +418,15 @@
           clearInterval(walkTimer);
           // finished countdown (45)
           // > increment count
-          if (lapCounter >= 10) {
+
+          // debug C
+          if (debug) {
+            totalLapsC = 2;
+          } else {
+            totalLapsC = 10;
+          }
+
+          if (lapCounter >= totalLapsC) {
             speak('完成');
             reset(true, true); // exit
           } else {
@@ -406,7 +437,7 @@
             running();
           }
         }
-      }, 1000);
+      }, secondC);
     }
 
     function timerOff(speech) {
